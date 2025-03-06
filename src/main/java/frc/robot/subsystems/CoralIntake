@@ -1,0 +1,42 @@
+package frc.robot.subsystems;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.XboxController;
+
+public class IntakeCoral extends SubsystemBase {
+    private final CANSparkMax intakeMotor;
+    private final XboxController operatorController;
+
+    public IntakeCoral(int operatorControllerPort) {
+        intakeMotor = new CANSparkMax(15, MotorType.kBrushless); // CAN ID 15
+        operatorController = new XboxController(operatorControllerPort);
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        double leftTrigger = operatorController.getLeftTriggerAxis();
+
+        if (leftTrigger > 0.1) {
+            intake(leftTrigger);
+        } else if (operatorController.getLeftBumper()) {
+            eject();
+        } else {
+            stop();
+        }
+    }
+
+    public void intake(double speed) {
+        intakeMotor.set(speed); // Set motor to intake
+    }
+
+    public void eject() {
+        intakeMotor.set(-1.0); // Set motor to eject
+    }
+
+    public void stop() {
+        intakeMotor.set(0); // Stop the motor
+    }
+}

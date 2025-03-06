@@ -1,0 +1,56 @@
+package frc.robot.subsystems;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax.IdleMode;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
+public class Wrist extends SubsystemBase {
+   
+    private final CANSparkMax wristMotorMotor;
+    private final XboxController controller;
+    private final XboxController operatorController;
+
+    public Climber(int motorPort, int controllerPort, int operatorControllerPort) {
+     
+        wristMotor = new CANSparkMax(16, MotorType.kBrushless); // CAN ID 16
+        operatorController = new XboxController(operatorControllerPort);
+
+        // Set the secondary motor to hold its position when not moving
+        wristMotor.setIdleMode(IdleMode.kBrake);
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        if (controller.getAButton()) {
+            climbUp();
+        } else if (controller.getXButton()) {
+            climbDown();
+        } else {
+            stopClimb();
+        }
+
+        if (operatorController.getRightBumper()) {
+            moveSecondaryUp();
+        } else if (operatorController.getLeftBumper()) {
+            moveSecondaryDown();
+        } else {
+            holdPosition();
+        }
+    }
+
+    public void moveSecondaryUp() {
+        wristMotor.set(1.0); // Set secondary motor to full speed up
+    }
+
+    public void moveSecondaryDown() {
+        wristMotor.set(-1.0); // Set secondary motor to full speed down
+    }
+
+    public void holdPosition() {
+        wristMotor.set(0); // Stop the secondary motor and hold position
+    }
+}

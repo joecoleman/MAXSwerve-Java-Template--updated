@@ -1,0 +1,47 @@
+package frc.robot.subsystems;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.XboxController;
+
+public class IntakeAlgae extends SubsystemBase {
+    private final CANSparkMax intakeMotor1;
+    private final CANSparkMax intakeMotor2;
+    private final XboxController operatorController;
+
+    public IntakeAlgae(int operatorControllerPort) {
+        intakeMotor1 = new CANSparkMax(17, MotorType.kBrushless); // CAN ID 17
+        intakeMotor2 = new CANSparkMax(27, MotorType.kBrushless); // CAN ID 27
+        operatorController = new XboxController(operatorControllerPort);
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        double rightTrigger = operatorController.getRightTriggerAxis();
+
+        if (rightTrigger > 0.1) {
+            intake(rightTrigger);
+        } else if (operatorController.getRightBumper()) {
+            eject();
+        } else {
+            stop();
+        }
+    }
+
+    public void intake(double speed) {
+        intakeMotor1.set(speed); // Set motor 1 to intake
+        intakeMotor2.set(-speed); // Set motor 2 to intake in opposite direction
+    }
+
+    public void eject() {
+        intakeMotor1.set(-1.0); // Set motor 1 to eject
+        intakeMotor2.set(1.0); // Set motor 2 to eject in opposite direction
+    }
+
+    public void stop() {
+        intakeMotor1.set(0); // Stop motor 1
+        intakeMotor2.set(0); // Stop motor 2
+    }
+}

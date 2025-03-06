@@ -1,0 +1,43 @@
+package frc.robot.subsystems;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.XboxController;
+
+public class Elevator extends SubsystemBase {
+    private final CANSparkMax elevatorMotor;
+    private final XboxController controller;
+
+    public Elevator(int motorPort, int controllerPort) {
+        elevatorMotor = new CANSparkMax(14, MotorType.kBrushless); // CAN ID 20
+        controller = new XboxController(drivercontrollerPort);
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        double rightTrigger = controller.getRightTriggerAxis();
+        double leftTrigger = controller.getLeftTriggerAxis();
+
+        if (rightTrigger > 0.1) {
+            moveUp(rightTrigger);
+        } else if (leftTrigger > 0.1) {
+            moveDown(leftTrigger);
+        } else {
+            stop();
+        }
+    }
+
+    public void moveUp(double speed) {
+        elevatorMotor.set(speed); // Set motor to speed up
+    }
+
+    public void moveDown(double speed) {
+        elevatorMotor.set(-speed); // Set motor to speed down
+    }
+
+    public void stop() {
+        elevatorMotor.set(0); // Stop the motor
+    }
+}
