@@ -14,17 +14,20 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.WristSubsystem;
+
 import java.util.List;
 
 /*
@@ -37,11 +40,14 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ElevatorSubsystem m_robotElevator = new ElevatorSubsystem();
+  private final WristSubsystem m_robotWrist = new WristSubsystem();
+  private final CoralIntakeSubsystem m_robotCoralIntake = new CoralIntakeSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  private final CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
     // The operators controller
-    XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  private final CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -56,9 +62,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.leftVerticalJoystick.getAsDouble(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.leftHorizontalJoystick.getAsDouble(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.rightHorizontalJoystick.getAsDouble(), OIConstants.kDriveDeadband),
                 true),
             m_robotDrive));
   }
@@ -73,15 +79,23 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+    m_driverController.leftBumper.whileTrue(new RunCommand(
+      () -> m_robotDrive.setX(),
+      m_robotDrive, m_robotDrive)
+    );
+    m_driverController.startButton.whileTrue(new InstantCommand(
+      () -> m_robotDrive.resetGyro(),
+      m_robotDrive)
+    );
 
-       new JoystickButton(m_driverController, XboxController.Button.kStart.value)
-        .whileTrue(new InstantCommand(
-            () -> m_robotDrive.resetGyro(),
-            m_robotDrive));      
+    // You can bind the rest of the buttons by changing the .BUTTON. and the METHOD
+    m_driverController.aButton.whileTrue(new StartEndCommand(() -> m_robotElevator.moveUp(10), () -> m_robotElevator.stop(), m_robotElevator));
+    m_driverController.bButton.whileTrue(new StartEndCommand(() -> m_robotElevator.moveDown(10), () -> m_robotElevator.stop(), m_robotElevator));
+    m_driverController.xButton.whileTrue(new StartEndCommand(() -> m_robotWrist.wristUp(10), () -> m_robotWrist.stop(), m_robotWrist));
+    m_driverController.yButton.whileTrue(new StartEndCommand(() -> m_robotWrist.wristDown(10), () -> m_robotWrist.stop(), m_robotWrist));
+
+    m_driverController.rightTrigger.whileTrue(new StartEndCommand(() -> m_robotCoralIntake.eject(), () -> m_robotCoralIntake.stop(), m_robotCoralIntake));
+    m_driverController.rightBumper.whileTrue(new StartEndCommand(() -> m_robotCoralIntake.intake(10), () -> m_robotCoralIntake.stop(), m_robotCoralIntake));
   }
 
   /**  pass the autonomous command to the main {@link Robot} class.
