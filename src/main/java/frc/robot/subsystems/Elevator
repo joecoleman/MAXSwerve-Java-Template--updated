@@ -10,7 +10,7 @@ public class Elevator extends SubsystemBase {
     private final XboxController controller;
 
     public Elevator(int motorPort, int controllerPort) {
-        elevatorMotor = new CANSparkMax(14, MotorType.kBrushless); // CAN ID 20
+        elevatorMotor = new CANSparkMax(14, MotorType.kBrushless); // CAN ID 14
         controller = new XboxController(drivercontrollerPort);
     }
 

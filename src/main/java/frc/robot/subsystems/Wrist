@@ -26,31 +26,26 @@ public class Wrist extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         if (controller.getAButton()) {
-            climbUp();
+            wristUp();
         } else if (controller.getXButton()) {
-            climbDown();
+            wristDown();
         } else {
-            stopClimb();
+            stopwrist();
+
+    public void moveUp(double speed) {
+                wristMotor.set(speed); // Set motor to speed up
+            }
+        
+    public void moveDown(double speed) {
+                wristMotor.set(-speed); // Set motor to speed down
+            }
+        
+    public void stop() {
+                wristMotor.set(0); // Stop the motor
+            }
         }
-
-        if (operatorController.getRightBumper()) {
-            moveSecondaryUp();
-        } else if (operatorController.getLeftBumper()) {
-            moveSecondaryDown();
-        } else {
-            holdPosition();
-        }
     }
 
-    public void moveSecondaryUp() {
-        wristMotor.set(1.0); // Set secondary motor to full speed up
-    }
 
-    public void moveSecondaryDown() {
-        wristMotor.set(-1.0); // Set secondary motor to full speed down
-    }
-
-    public void holdPosition() {
-        wristMotor.set(0); // Stop the secondary motor and hold position
     }
 }
