@@ -18,14 +18,19 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -37,11 +42,14 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final AlgaeIntake m_algaeIntake = new AlgaeIntake();
+  private final Climber m_climber = new Climber();
+  private final CoralIntake m_coralIntake = new CoralIntake();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-    // The operators controller
-    XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  // The operators controller
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -78,13 +86,30 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-       new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .whileTrue(new InstantCommand(
             () -> m_robotDrive.resetGyro(),
-            m_robotDrive));      
+            m_robotDrive));
+    // AlgaeIntake
+    m_operatorController.rightTrigger(0.1).whileTrue(new InstantCommand(() -> m_algaeIntake.intake(0.2)))
+        .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
+    m_operatorController.rightBumper().whileTrue(new InstantCommand(() -> m_algaeIntake.eject()))
+        .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
+    // Climber
+    m_operatorController.a().whileTrue(new InstantCommand(() -> m_climber.climbUp()))
+        .onFalse(new InstantCommand(() -> m_climber.stopClimb()));
+    m_operatorController.x().whileTrue(new InstantCommand(() -> m_climber.climbDown()))
+        .onFalse(new InstantCommand(() -> m_climber.stopClimb()));
+    // CoralIntake
+    m_operatorController.leftTrigger(0.1).whileTrue(new InstantCommand(() -> m_coralIntake.intake(0.2)))
+        .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
+    m_operatorController.leftBumper().whileTrue(new InstantCommand(() -> m_algaeIntake.eject()))
+        .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
+
   }
 
-  /**  pass the autonomous command to the main {@link Robot} class.
+  /**
+   * pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
