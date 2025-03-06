@@ -187,4 +187,9 @@ public Object zeroHeadingCommand() {
     //
     throw new UnsupportedOperationException("Unimplemented method 'zeroHeadingCommand'");
 }
+
+public Object resetGyro() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'resetGyro'");
+}
 }
