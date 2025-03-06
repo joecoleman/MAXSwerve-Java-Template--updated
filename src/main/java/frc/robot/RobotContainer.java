@@ -22,6 +22,7 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Wrist;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -45,6 +46,7 @@ public class RobotContainer {
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   private final Climber m_climber = new Climber();
   private final CoralIntake m_coralIntake = new CoralIntake();
+  private final Wrist m_wrist = new Wrist();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -86,7 +88,7 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .whileTrue(new InstantCommand(
             () -> m_robotDrive.resetGyro(),
             m_robotDrive));
@@ -105,7 +107,11 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
     m_operatorController.leftBumper().whileTrue(new InstantCommand(() -> m_algaeIntake.eject()))
         .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
-
+    // Wrist
+    m_operatorController.b().whileTrue(new InstantCommand(() -> m_wrist.moveUp(0.2)))
+        .onFalse(new InstantCommand(() -> m_wrist.stop()));
+    m_operatorController.y().whileTrue(new InstantCommand(() -> m_wrist.moveDown()))
+        .onFalse(new InstantCommand(() -> m_wrist.stop()));
   }
 
   /**
