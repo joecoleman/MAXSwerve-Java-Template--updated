@@ -108,9 +108,9 @@ public class RobotContainer {
     m_operatorController.leftBumper().whileTrue(new InstantCommand(() -> m_algaeIntake.eject()))
         .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
     // Wrist
-    m_operatorController.b().whileTrue(new InstantCommand(() -> m_wrist.moveUp(0.2)))
+    m_operatorController.b().whileTrue(new InstantCommand(() -> m_wrist.moveUp(0.1)))
         .onFalse(new InstantCommand(() -> m_wrist.stop()));
-    m_operatorController.y().whileTrue(new InstantCommand(() -> m_wrist.moveDown()))
+    m_operatorController.y().whileTrue(new InstantCommand(() -> m_wrist.moveDown(-0.1)))
         .onFalse(new InstantCommand(() -> m_wrist.stop()));
   }
 

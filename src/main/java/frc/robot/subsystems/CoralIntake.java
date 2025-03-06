@@ -7,8 +7,6 @@ import frc.robot.Constants;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.wpilibj.XboxController;
-
 public class CoralIntake extends SubsystemBase {
     private final SparkMax intakeMotor;
 
