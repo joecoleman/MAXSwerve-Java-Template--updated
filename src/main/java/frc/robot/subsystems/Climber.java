@@ -20,13 +20,10 @@ public class Climber extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    public void climbUp() {
-        climberMotor.set(1.0); // Set motor to full speed up
+    public void climb(double speed) {
+        climberMotor.set(speed); // Set motor to full speed up
     }
 
-    public void climbDown() {
-        climberMotor.set(-1.0); // Set motor to full speed down
-    }
 
     public void stopClimb() {
         climberMotor.stopMotor(); // Stop the motor

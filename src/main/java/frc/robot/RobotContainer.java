@@ -22,6 +22,7 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Wrist;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -45,6 +46,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   private final Climber m_climber = new Climber();
+  private final Elevator m_elevator = new Elevator();
   private final CoralIntake m_coralIntake = new CoralIntake();
   private final Wrist m_wrist = new Wrist();
 
@@ -98,10 +100,11 @@ public class RobotContainer {
     m_operatorController.rightBumper().whileTrue(new InstantCommand(() -> m_algaeIntake.eject()))
         .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
     // Climber
-    m_operatorController.a().whileTrue(new InstantCommand(() -> m_climber.climbUp()))
+    m_operatorController.a().whileTrue(new InstantCommand(() -> m_climber.climb(m_operatorController.getLeftY())))
         .onFalse(new InstantCommand(() -> m_climber.stopClimb()));
-    m_operatorController.x().whileTrue(new InstantCommand(() -> m_climber.climbDown()))
-        .onFalse(new InstantCommand(() -> m_climber.stopClimb()));
+    // Elevator
+    m_operatorController.x().whileTrue(new InstantCommand(() -> m_elevator.move(m_operatorController.getLeftY())))
+        .onFalse(new InstantCommand(() -> m_elevator.stop()));
     // CoralIntake
     m_operatorController.leftTrigger(0.1).whileTrue(new InstantCommand(() -> m_coralIntake.intake(0.2)))
         .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
@@ -112,6 +115,7 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> m_wrist.stop()));
     m_operatorController.y().whileTrue(new InstantCommand(() -> m_wrist.moveDown(-0.1)))
         .onFalse(new InstantCommand(() -> m_wrist.stop()));
+
   }
 
   /**
